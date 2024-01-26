@@ -26,7 +26,32 @@ class RedisTest extends Command
      */
     public function handle()
     {
-        Redis::set("aaa", "bbb");
-        echo Redis::get("aaa");
+        $redis = Redis::connection("default");
+
+        // string
+        $redis->set("string:php:string", "string value");
+
+        $array = [
+            "key1" => "value1",
+            "key2" => "value2",
+            "key3" => "value3",
+        ];
+        $redis->set("string:php:array", json_encode($array));
+
+        // hash
+        $redis->hset("hash:php", "key1", "value1");
+        $redis->hset("hash:php", "key2", "value2");
+        $redis->hset("hash:php", "key3", "value3");
+
+
+        // stream
+        for ($i = 0; $i < 10; $i++) {
+            $data = [
+                "key1" => "value1-{$i}",
+                "key2" => "value2-{$i}",
+                "key3" => "value3-{$i}",
+            ];
+            $redis->xadd("stream:php", "*", $data);
+        }
     }
 }
